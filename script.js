@@ -14,35 +14,46 @@ document.querySelector("#current-time").innerHTML = timeString;
 let canvas = document.querySelector("#clock");
 let context = canvas.getContext("2d");
 
-let clockRadius = 100;
+// How big the clock is 
+let clockRadius = 125;
 
 // Make sure the clock is centered in the canvas
 let clockX = canvas.width / 2;
 let clockY = canvas.height / 2;
 
-// <--- put math here later;
 
-// this line should be 10 px thick and red
-context.lineWidth = 10;
-context.strokeStyle = "#DD0000";
+Math.TAU = 2 * Math.PI;
+
+let drawArm = (progress, armThickness, armLength, armColor) => {
+    let armRadians = (Math.TAU * progress) - (Math.TAU/4);
+
+    let targetX = clockX + Math.cos(armRadians) * (armLength * clockRadius);
+    let targetY = clockY + Math.sin(armRadians) * (armLength * clockRadius);
+
+// style
+context.lineWidth = armThickness;
+context.strokeStyle = armColor;
 
 context.beginPath();
 context.moveTo(clockX, clockY); // start at the center
-context.lineTo(clockX + clockRadius, clockY); // Draw to the right
+context.lineTo(targetX, targetY); // Draw to the right
 context.stroke();
+     }
 
-// this line should be 5 px thick and black
-context.lineWidth = 5;
-context.strokeStyle = "#000000"
+context.clearRect(0, 0, canvas.width, canvas.height); // Remove old lines;
 
-context.beginPath();
-context.moveTo(clockX, clockY);
-context.lineTo(clockX, clockY - clockRadius);
-context.stroke();
-
+drawArm(h / 12, 10, 0.50, "#000000"); // Hours
+drawArm(m / 60, 4, 0.75, "#000000"); // Minutes
+drawArm(s / 60, 2, 1.00, "#FF0000"); // Seconds
 };
 
-document.addEventListener('DOMContentLoaded', displayTime);
+let setTimer = () => {
+    setInterval(displayTime, 1000);
+    displayTime();
+}
+
+document.addEventListener('DOMContentLoaded', setTimer);
+
 
 // Padding the zero to the beginning of the number if needed
 let padZero = (num) => {
@@ -68,4 +79,3 @@ let formatHour = (h) => {
 getTimePeriod = (h) => {
     return (h < 12) ? " AM" : " PM";
 }
-
